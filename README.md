@@ -9,7 +9,7 @@ alias Export 'python ~/Downloads/DjangoCodeSharer.py'
 ```
 
 ## Example
-<img src="img.jpg">
+<img src="img.png">
 
 <br>
 
