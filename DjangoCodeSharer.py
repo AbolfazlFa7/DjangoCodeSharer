@@ -1,122 +1,72 @@
+import sys
 from pathlib import Path
 import colorama
-import sys
 
 colorama.init(autoreset=True)
 
-if '-f' in sys.argv:
-    Format = True
-    if len(sys.argv) == 2:
-        sys.argv.insert(1, '.')
-else:
-    Format = False
-
-python = False
-html = False
-text = False
-css = False
-js = False
-if Format:
-    print(f'\n{colorama.Back.BLACK+colorama.Fore.YELLOW}Select number code : {
-          colorama.Fore.GREEN}Example{colorama.Fore.LIGHTBLUE_EX} "123" = python , html , text :')
-    print()
-    print(colorama.Fore.CYAN+'1' + colorama.Fore.WHITE +
-          '.' + colorama.Fore.LIGHTGREEN_EX + ' Python')
-    print(colorama.Fore.CYAN+'2' + colorama.Fore.WHITE +
-          '.' + colorama.Fore.LIGHTRED_EX + ' Html')
-    print(colorama.Fore.CYAN+'3' + colorama.Fore.WHITE +
-          '.' + colorama.Fore.RESET + ' Text')
-    print(colorama.Fore.CYAN+'4' + colorama.Fore.WHITE +
-          '.' + colorama.Fore.RED + ' Css')
-    print(colorama.Fore.CYAN+'5' + colorama.Fore.WHITE +
-          '.' + colorama.Fore.LIGHTYELLOW_EX + ' Javascript')
-    print(colorama.Fore.CYAN+'6' + colorama.Fore.WHITE + '. ' +
-          colorama.Fore.BLACK+colorama.Back.WHITE + 'All')
-    print()
-    choice = input(colorama.Fore.LIGHTYELLOW_EX +
-                   f'Enter your choice :{colorama.Fore.LIGHTCYAN_EX} ')
-
-    python_format = False
-    html_format = False
-    text_format = False
-    css_format = False
-    js_format = False
-
-    for x in choice.strip():
-        if x == '1':
-            python_format = True
-
-        elif x == '2':
-            html_format = True
-
-        elif x == '3':
-            text_format = True
-
-        elif x == '4':
-            css_format = True
-
-        elif x == '5':
-            js_format = True
-
-        elif x == '6':
-            python_format = True
-            html_format = True
-            text_format = True
-            css_format = True
-            js_format = True
-
-        else:
-            print(colorama.Fore.LIGHTRED_EX+'invalid choice')
-            exit()
+FILE_TYPES = {
+    '1': ('.py',),
+    '2': ('.html', '.htm'),
+    '3': ('.txt',),
+    '4': ('.css',),
+    '5': ('.js',),
+    '6': ('.env',),
+    '7': ('.py', '.html', '.htm', '.txt', '.css', '.js', '.env')
+}
 
 
-x = sys.argv[1] if len(sys.argv) > 1 else '.'
-x = Path(r'{}'.format(x))
-print(colorama.Fore.CYAN+'\nPath : '+colorama.Fore.GREEN+str(x.absolute()))
+def get_user_choice():
+    """Prompt user to select file types to process."""
+    print(f'\n{colorama.Back.BLACK + colorama.Fore.YELLOW}Select file type (example: {colorama.Fore.GREEN}"123"{colorama.Fore.LIGHTBLUE_EX} for Python, HTML, and Text):')
+    print(f"{colorama.Fore.CYAN}1{colorama.Fore.WHITE}. {colorama.Fore.LIGHTGREEN_EX}Python")
+    print(f"{colorama.Fore.CYAN}2{colorama.Fore.WHITE}. {colorama.Fore.LIGHTRED_EX}HTML")
+    print(f"{colorama.Fore.CYAN}3{colorama.Fore.WHITE}. {colorama.Fore.RESET}Text")
+    print(f"{colorama.Fore.CYAN}4{colorama.Fore.WHITE}. {colorama.Fore.RED}CSS")
+    print(f"{colorama.Fore.CYAN}5{colorama.Fore.WHITE}. {colorama.Fore.LIGHTYELLOW_EX}JavaScript")
+    print(f"{colorama.Fore.CYAN}6{colorama.Fore.WHITE}. {colorama.Fore.LIGHTMAGENTA_EX}.env")
+    print(f"{colorama.Fore.CYAN}7{colorama.Fore.WHITE}. {colorama.Fore.BLACK + colorama.Back.WHITE}All")
+    choice = input(
+        f"{colorama.Fore.LIGHTYELLOW_EX}Enter your choice: {colorama.Fore.LIGHTCYAN_EX}")
 
-file = f"{Path(__file__).with_name('DjangoCodeSharer.txt').as_posix()}"
-with open(file, 'a') as y:
-    f = Path(file)
-
-    if not f.exists():
-        f.touch()
-    else:
-        f.write_text('')
-
-    y.write("This is my django project , with all of its file and their location:\n\n")
-    for a in x.rglob('*.*'):
-        if Format:
-            if python_format:
-                python = a.suffix == '.py'
-            if html_format:
-                html = a.suffix == '.html' or a.suffix == '.htm'
-            if text_format:
-                text = a.suffix == '.txt'
-            if css_format:
-                css = a.suffix == '.css'
-            if js_format:
-                js = a.suffix == '.js'
-        else:
-            python = a.suffix == '.py'
-            html = a.suffix == '.html' or a.suffix == '.htm'
-
-        suffix = any([python, html, text, css, js])
-
-        if suffix:
-
-            try:
-                y.write(f'content of this File : ({
-                        a}) -->\n{a.read_text()}\n\n')
-                print(f'{a}  {colorama.Fore.LIGHTGREEN_EX+'Writed' +
-                      colorama.Fore.WHITE+' '+str('{:.2f}'.format(a.stat().st_size / 1024))+' Kb'}')
-            except Exception as e:
-                print(e)
-                print(f'{a}  {colorama.Fore.LIGHTRED_EX+'Error'}')
-
-        else:
-            print(f'{a}  {colorama.Fore.GREEN+'Not Writed'}')
+    selected_extensions = set()
+    for char in choice.strip():
+        if char not in FILE_TYPES:
+            print(f"{colorama.Fore.LIGHTRED_EX}Invalid choice: {char}")
+            sys.exit(1)
+        selected_extensions.update(FILE_TYPES[char])
+    return selected_extensions
 
 
-print(colorama.Fore.CYAN+'\nDone !')
-print('\n'+colorama.Fore.BLUE+'File Size : ' + colorama.Fore.LIGHTYELLOW_EX +
-      str('{:.1f}'.format(Path(file).stat().st_size / 1024))+' Kb')
+def main():
+    format_mode = '-f' in sys.argv
+    target_path = Path(sys.argv[1] if len(
+        sys.argv) > 1 and sys.argv[1] != '-f' else '.').absolute()
+    print(f"{colorama.Fore.CYAN}Path: {colorama.Fore.GREEN}{target_path}")
+
+    extensions = get_user_choice() if format_mode else {
+        '.py', '.html', '.htm', '.env'}
+
+    output_file = Path(__file__).with_name('file.txt')
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write("My Django project, including all files and their locations:\n\n")
+
+        for file_path in target_path.rglob('*.*'):
+            if file_path.suffix.lower() in extensions:
+                try:
+                    content = file_path.read_text(encoding='utf-8')
+                    f.write(f'File content: ({file_path}) -->\n{content}\n\n')
+                    size_kb = file_path.stat().st_size / 1024
+                    print(
+                        f"{file_path}  {colorama.Fore.LIGHTGREEN_EX}Written {colorama.Fore.WHITE}{size_kb:.2f} KB")
+                except Exception as e:
+                    print(f"{file_path}  {colorama.Fore.LIGHTRED_EX}Error: {e}")
+            else:
+                print(f"{file_path}  {colorama.Fore.GREEN}Not written")
+
+    size_kb = output_file.stat().st_size / 1024
+    print(f"\n{colorama.Fore.CYAN}Done!")
+    print(f"{colorama.Fore.BLUE}File size: {colorama.Fore.LIGHTYELLOW_EX}{size_kb:.1f} KB")
+
+
+if __name__ == "__main__":
+    main()
